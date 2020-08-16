@@ -167,7 +167,7 @@ def load_user_from_request(request):
         if user:
             return user
 
-    if request.view_args:
+    if request.view_args and all(key in ('book_id', 'book_format', 'anyname') for key in request.view_args):
         book_id = request.view_args['book_id']
         book_format = request.view_args['book_format']
         book_name = request.view_args['anyname']
@@ -179,8 +179,7 @@ def load_user_from_request(request):
             info = cookie.decode_cookie(book_name)
 
             if type(info).__name__ == "TrustedCookie":
-                expiration = datetime.fromisoformat(info.expiration)
-                if datetime.utcnow() < expiration:
+                if datetime.utcnow().isoformat() < info.expiration:
                     user_id = info.contents['_user_id']
                     user = load_user(user_id)
                     return user
