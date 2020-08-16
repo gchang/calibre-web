@@ -174,6 +174,7 @@ def update_view_configuration():
 
     _config_int("config_read_column")
     _config_int("config_theme")
+    _config_int("config_epub_viewer")
     _config_int("config_random_books")
     _config_int("config_books_per_page")
     _config_int("config_authors_max")

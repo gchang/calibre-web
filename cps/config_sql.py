@@ -69,6 +69,7 @@ class _Settings(_Base):
     config_title_regex = Column(String, default=u'^(A|The|An|Der|Die|Das|Den|Ein|Eine|Einen|Dem|Des|Einem|Eines)\s+')
     config_mature_content_tags = Column(String, default='')
     config_theme = Column(Integer, default=0)
+    config_epub_viewer = Column(Integer, default=0)
 
     config_log_level = Column(SmallInteger, default=logger.DEFAULT_LOG_LEVEL)
     config_logfile = Column(String)

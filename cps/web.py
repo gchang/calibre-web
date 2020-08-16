@@ -37,6 +37,7 @@ from flask import Blueprint
 from flask import render_template, request, redirect, send_from_directory, make_response, g, flash, abort, url_for
 from flask_babel import gettext as _
 from flask_login import login_user, logout_user, login_required, current_user, confirm_login
+from flask_cookie_decode import CookieDecode
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, OperationalError
 from sqlalchemy.sql.expression import text, func, true, false, not_, and_, or_
 from werkzeug.exceptions import default_exceptions, InternalServerError
@@ -166,6 +167,23 @@ def load_user_from_request(request):
         if user:
             return user
 
+    if request.view_args:
+        book_id = request.view_args['book_id']
+        book_format = request.view_args['book_format']
+        book_name = request.view_args['anyname']
+        if book_id is not None and book_format is not None and book_name is not None:
+            if book_name.endswith("." + book_format):
+                book_name = book_name[:-len("." + book_format)]
+            cookie = CookieDecode()
+            cookie.init_app(app)
+            info = cookie.decode_cookie(book_name)
+
+            if type(info).__name__ == "TrustedCookie":
+                expiration = datetime.fromisoformat(info.expiration)
+                if datetime.utcnow() > expiration:
+                    user_id = info.contents['_user_id']
+                    user = load_user(user_id)
+                    return user
     return
 
 
@@ -1653,7 +1671,11 @@ def read_book(book_id, book_format):
                                                              ub.Bookmark.format == book_format.upper())).first()
     if book_format.lower() == "epub":
         log.debug(u"Start epub reader for %d", book_id)
-        return render_title_template('read.html', bookid=book_id, title=_(u"Read a Book"), bookmark=bookmark)
+        if config.config_epub_viewer == 1:
+            session_id = request.cookies.get('session')
+            return render_title_template('readepub.html', bookid=book_id, title=_(u"Read a Book"), session_id=session_id)
+        else:
+            return render_title_template('read.html', bookid=book_id, title=_(u"Read a Book"), bookmark=bookmark)
     elif book_format.lower() == "pdf":
         log.debug(u"Start pdf reader for %d", book_id)
         return render_title_template('readpdf.html', pdffile=book_id, title=_(u"Read a Book"))
