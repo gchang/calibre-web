@@ -180,7 +180,7 @@ def load_user_from_request(request):
 
             if type(info).__name__ == "TrustedCookie":
                 expiration = datetime.fromisoformat(info.expiration)
-                if datetime.utcnow() > expiration:
+                if datetime.utcnow() < expiration:
                     user_id = info.contents['_user_id']
                     user = load_user(user_id)
                     return user
