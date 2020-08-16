@@ -11,9 +11,8 @@
 		<script id="bibi-preset" src="{{ url_for('static', filename='js/libs/bibi/presets/default.js') }}" data-bibi-bookshelf="/"></script>
 	</head>
 	<body data-bibi-book="{{ url_for('web.serve_book', book_id=bookid, book_format='epub', anyname=session_id+".epub") }}">
-		<div id="bibi-info">{{ session_id if session_id != None }}</div>
+		<div id="bibi-info"></div>
 		<div id="bibi-book-data" data-bibi-book-mimetype="application/epub+zip" hidden="hidden">
 		</div>
 	</body>
 </html>
-e
